@@ -1,0 +1,30 @@
+name: Docker Build and Push
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      
+      - name: Login to Google
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Setup Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Login Docker
+        run: gcloud auth configure-docker asia-south1-docker.pkg.dev
+      
+      - name: Build image
+        run: docker build -t asia-south1-docker.pkg.dev/pradhi-shared-envs/docker-images/python-app:latest .
+      
+      - name: Push image
+        run: docker push asia-south1-docker.pkg.dev/pradhi-shared-envs/docker-images/python-app:latest
